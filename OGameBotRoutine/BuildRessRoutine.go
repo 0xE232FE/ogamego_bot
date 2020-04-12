@@ -15,7 +15,7 @@ func (bot *OGameBot) BuildNextRess() {
 	targetPlanet, targetBuilding, level := bot.GetNextResBuilding()
 	CurrentRessInTargetPlanet, _ := bot.Ogamebot.GetResources(targetPlanet.GetID())
 	NeedsRess := targetBuilding.GetPrice(level + 1)
-	//bot.Ogamebot.Abandon()
+
 	if bot.BuildRessSkipList.Contains(targetPlanet) {
 		log.Info("")
 		return
@@ -30,12 +30,12 @@ func (bot *OGameBot) BuildNextRess() {
 
 			log.Infof("%s Sending ress from Main[%s] to %s", Logger.CurrentFileNameAndLine(), bot.MainPlanetCoord, targetPlanet.Coordinate)
 			bot.SendRessRoutineFromCelestitial(bot.MainPlanetCelestitial, NeedsRess.Sub(CurrentRessInTargetPlanet), targetPlanet.Coordinate)
-			timnes, _ := bot.Ogamebot.FlightTime(bot.MainPlanetCelestitial.GetCoordinate(), targetPlanet.Coordinate, ogame.HundredPercent, ogame.ShipsInfos{LargeCargo: 1})
+			flightTime, _ := bot.Ogamebot.FlightTime(bot.MainPlanetCelestitial.GetCoordinate(), targetPlanet.Coordinate, ogame.HundredPercent, ogame.ShipsInfos{LargeCargo: 1})
 
 			go func() {
 				//TODO : 지연 빌드 혹은 지연 큐 삽입 테스트 필요
-				log.Infof("%s Sleep %d secs and Build command will be added to queue", Logger.CurrentFileNameAndLine(), timnes+30)
-				time.Sleep(time.Second*time.Duration(timnes) + time.Second*30)
+				log.Infof("%s Sleep %d secs and Build command will be added to queue", Logger.CurrentFileNameAndLine(), flightTime+30)
+				time.Sleep(time.Second*time.Duration(flightTime) + time.Second*30)
 				log.Info("RessBuilding Lazy Built")
 				Queue.JobQueue.Set(Queue.DefaultPriority, func() { OgameUtil.BuildTargetBuilding(bot.Ogamebot, targetPlanet.GetID(), *targetBuilding) })
 				bot.BuildRessSkipList.Remove(targetPlanet)

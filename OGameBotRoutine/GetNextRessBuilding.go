@@ -28,15 +28,7 @@ func (bot *OGameBot) GetNextResBuilding() (*ogame.Planet, *ogame.BaseBuilding, i
 		resbuildings, _ := elm.GetResourcesBuildings()
 		energy, _ := elm.GetResources()
 
-		temp, _ := bot.Ogamebot.GetShips(elm.GetID())
 
-		temp2 := bot.Ogamebot.GetUserInfos()
-
-		temp3 := bot.Ogamebot.GetServer().Settings.EspionageProbeRaids
-
-		_ = temp2
-		_ = temp
-		_ = temp3
 
 		if energy.Energy < 0 && resbuildings.SolarPlant < 22 {
 
@@ -46,7 +38,17 @@ func (bot *OGameBot) GetNextResBuilding() (*ogame.Planet, *ogame.BaseBuilding, i
 
 			return targetPlanet, targetBuilding, currentLevel
 
-		} else {
+		}  else {
+
+			if  resbuildings.MetalMine > 12 && resbuildings.CrystalMine > 12 && resbuildings.DeuteriumSynthesizer > 10 {
+				targetPlanet = &elm
+				_,targetBuilding,currentLevel := bot.BuildBaseFacility(elm)
+
+				if currentLevel > -1 && targetBuilding != nil {
+					lowsestPrice = 	OgameUtil.ResourcePricesSum(targetBuilding.GetPrice(resbuildings.MetalMine))
+				}
+
+			}
 
 			if lowsestPrice > OgameUtil.ResourcePricesSum(ogame.MetalMine.GetPrice(resbuildings.MetalMine)) {
 				targetPlanet = &elm
